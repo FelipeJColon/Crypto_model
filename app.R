@@ -57,18 +57,27 @@ ui <- shinyUI(fluidPage(
                  wellPanel(
                       tags$h4("Initial conditions"),
                       
-                      numericInput(inputId="N", label="Population:", value=1e6, step=1e4),
-                      numericInput(inputId="L", label="Initial infected and latent:", value=0),
-                      numericInput(inputId="I", label="Initial infectious and symptomatic:", 
+                      numericInput(inputId="N", label="Population:", value=1e6, 
+                                   step=1e4),
+                      numericInput(inputId="L", 
+                                   label="Initial infected and latent:", 
                                    value=0),
-                      numericInput(inputId="A", label="Initial infectious and asymptomatic:", 
+                      numericInput(inputId="I",
+                                   label="Initial infectious and symptomatic:", 
                                    value=0),
-                      numericInput(inputId="R", label="Initial recovered:", value=0),
-                      numericInput(inputId="intake", label="Average water intake (L/day):", 
-                                   value=0.533, min=0.25, max=8, step=0.001),
-                      numericInput(inputId="ndays", label="Time span:", value=50),
-                      numericInput(inputId="remed", label="Days before public health action:", 
-                                   value=15)
+                      numericInput(inputId="A", 
+                                   label="Initial infectious and asymptomatic:", 
+                                   value=0),
+                      numericInput(inputId="R", 
+                                   label="Initial recovered:", value=0),
+                      numericInput(inputId="intake", 
+                                   label="Average water intake (L/day):", 
+                                   value=1.8, min=1, max=2.4, step=0.1),
+                      numericInput(inputId="ndays", label="Time span:", 
+                                   value=50),
+                      numericInput(inputId="remed", 
+                                   label="Days before public health action:", 
+                                   value=3)
                  )
           ),
           
@@ -104,21 +113,26 @@ ui <- shinyUI(fluidPage(
                tags$h4("Model parameters"),
                
                column(3,
-                      sliderInput(inputId="sigma", label="Incubation period (days):", 
-                                  min=1, max=10, value=5, step=0.1), 
-                      sliderInput(inputId="gamma", label="Infectious period (days):", 
+                      sliderInput(inputId="sigma", 
+                                  label="Incubation period (days):", 
+                                  min=1, max=21, value=5, step=0.1), 
+                      sliderInput(inputId="gamma",
+                                  label="Infectious period (days):", 
                                   min=3, max=50, value=7, step=0.1)), 
                column(3, 
                       sliderInput(inputId="p",  
-                                  label="Fraction of Latent that become infectious and symptomatic:", 
+                                  label=paste("Fraction of Latent that become",
+                                              "infectious and symptomatic:"), 
                                   min=0.2, max=0.9, value=0.75, step=0.01),
                       sliderInput(inputId="oocysts",
-                                  label="Number of oocysts released into water system (per litre)",
-                                  min=10, max=1e6, value=100, step=10)),
+                                  label=paste("Number of oocysts released into",
+                                              "water system (per litre)"),
+                                  min=10, max=1e6, value=100, step=5)),
                column(3, 
                       sliderInput(inputId="prop",
-                                  label=paste("Proportion of the population in contact with",
-                                              "infected water (per day)"),
+                                  label=paste("Proportion of the population in",
+                                              "contact with infected water",
+                                              "(per day)"),
                                   min=1e-6, max=1e-1, value=1e-2, step=1e-4)
                       
                )
@@ -214,7 +228,7 @@ server <- shinyServer(function(input, output) {
           # Define plot structure
           myPlot <- ggplot(dataLong[dataLong$Indicator %in% input$Indicators,], 
                            aes(x=time, y=Individuals, group=Indicator)) + 
-               geom_line(aes(colour=Indicator), size=1, alpha=.75) + 
+               geom_line(aes(colour=Indicator), size=1.5, alpha=.75) + 
                ggtitle("Population totals") +
                theme_bw() + 
                scale_x_continuous(name="Days") +
@@ -229,7 +243,10 @@ server <- shinyServer(function(input, output) {
                                               size=rel(1.2),
                                               color="black")) +
                theme(legend.position="right") +
-               theme(legend.title=element_blank())
+               theme(legend.title=element_blank())+
+               scale_color_manual(values=c("#000000", "#E69F00", "#56B4E9",
+                                           "#009E73", "#F0E442", "#0072B2", 
+                                           "#D55E00", "#CC79A7"))
           
           # Print plot to screen
           print(myPlot)
